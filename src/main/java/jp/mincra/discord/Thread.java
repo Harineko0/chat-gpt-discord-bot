@@ -18,9 +18,9 @@ public class Thread {
 
     public void addMessage(Message message) {
         history.add(message);
-        if (history.size() > 4) {
-            history.remove(0);
-        }
+//        if (history.size() > 6) {
+//            history.remove(0);
+//        }
     }
 
     public ThreadChannel getChannel() {

@@ -53,14 +53,18 @@ public class Listener extends ListenerAdapter {
 
             if (threadManager.isRegistered(id)) {
                 Thread thread = threadManager.getThread(id);
-                thread.addMessage(Message.create(Role.USER, event.getMessage().getContentDisplay()));
-                System.out.println(thread);
+                thread.addMessage(Message.create(Role.USER, event.getMessage().getContentDisplay().replaceAll("\n", "")));
+                System.out.println("Thread: " + thread);
 
                 try {
                     GPTResponse res = GPTBot.getGpt().post(thread.generateRequest());
-                    Message reply = res.getChoices().get(0).getMessage();
-                    thread.addMessage(reply);
-                    channel.sendMessage(reply.getContent()).queue();
+                    System.out.println("Response: " + res);
+                    if (res.getChoices() != null) {
+                        Message reply = res.getChoices().get(0).getMessage();
+                        thread.addMessage(Message.create(reply.getRole(), reply.getContent().replaceAll("\n", "")));
+                        channel.sendMessage(reply.getContent()).queue();
+                    }
+
 
                 } catch (IOException | InterruptedException e) {
                     throw new RuntimeException(e);
