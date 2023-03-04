@@ -22,12 +22,12 @@ public class GPTBot {
         jda = JDABuilder.createDefault(Constant.TOKEN, GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGES)
                 .disableCache(CacheFlag.MEMBER_OVERRIDES, CacheFlag.VOICE_STATE)
                 .setBulkDeleteSplittingEnabled(false)
-                .setActivity(Activity.watching("Type /ask"))
+                .setActivity(Activity.watching("Type /talk"))
                 .addEventListeners(new Listener())
                 .build();
 
         jda.updateCommands().addCommands(
-                Commands.slash("ask", "Start conversation with me").addOption(OptionType.STRING, "thread-title", "This will be a name of thread.", true)
+                Commands.slash("talk", "Start conversation in a new thread").addOption(OptionType.STRING, "thread-title", "This will be a name of thread.", true)
         ).queue();
     }
 

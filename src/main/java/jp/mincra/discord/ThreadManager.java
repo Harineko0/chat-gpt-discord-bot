@@ -6,7 +6,7 @@ import java.util.Map;
 public class ThreadManager {
     private final Map<String, Thread> idToThread = new HashMap<>();
 
-    public void addThread(Thread thread) {
+    public void registerThread(Thread thread) {
         idToThread.put(thread.getChannel().getId(), thread);
 
     }

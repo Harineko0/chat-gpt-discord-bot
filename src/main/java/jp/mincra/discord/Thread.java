@@ -16,11 +16,13 @@ public class Thread {
         this.channel = channel;
     }
 
+    public Thread(ThreadChannel channel, List<Message> history) {
+        this.history = history;
+        this.channel = channel;
+    }
+
     public void addMessage(Message message) {
         history.add(message);
-//        if (history.size() > 6) {
-//            history.remove(0);
-//        }
     }
 
     public ThreadChannel getChannel() {
