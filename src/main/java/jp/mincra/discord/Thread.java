@@ -4,8 +4,6 @@ import jp.mincra.chatgpt.dto.GPTRequest;
 import jp.mincra.chatgpt.dto.Message;
 import jp.mincra.chatgpt.dto.Role;
 import jp.mincra.discord.entity.MessageEntity;
-import jp.mincra.discord.entity.UserEntity;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 
 import java.util.ArrayList;
