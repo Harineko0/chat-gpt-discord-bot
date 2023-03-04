@@ -27,8 +27,13 @@ public class Thread {
     }
 
     public void addMessage(MessageEntity message) {
-        if (message.user() != null && !usersId.contains(message.user().getId())) {
-            history.add(new MessageEntity(Role.SYSTEM, GPTConverter.addUserSyntax(message.user())));
+        var user = message.user();
+        if (user != null) {
+            var userId = user.getId();
+            if (!usersId.contains(userId)) {
+                history.add(new MessageEntity(Role.SYSTEM, GPTConverter.addUserSyntax(message.user())));
+                usersId.add(userId);
+            }
         }
         history.add(message);
     }

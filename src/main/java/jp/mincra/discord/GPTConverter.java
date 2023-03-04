@@ -7,7 +7,7 @@ public class GPTConverter {
     public static String messageSyntax(MessageEntity message) {
         if (message.user() != null) {
             return "id: " + message.user().getId() +
-                    "  message: " + message.content();
+                    "  message: " + message.content().replaceAll("\n", "");
         } else {
             return message.content();
         }

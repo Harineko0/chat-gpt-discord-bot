@@ -19,6 +19,8 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Objects;
 
 public class Listener extends ListenerAdapter {
@@ -42,15 +44,24 @@ public class Listener extends ListenerAdapter {
                     return;
                 }
 
-                ForumPost post = botForum.createForumPost(threadTitle, MessageCreateData.fromContent("私は役に立つアシスタントです")).complete();
+                ForumPost post = botForum.createForumPost(threadTitle, MessageCreateData.fromContent("じぷにゃんにゃ。何を話すにゃ？")).complete();
                 Thread thread = new Thread(post.getThreadChannel());
-                thread.addMessage(new MessageEntity(Role.SYSTEM, "あなたは役に立つアシスタントです。以下の構文のようにユーザーの情報を渡します。あなたはそれに従って返答してください。\nid: 000000000000000000\n  name: 名前"));
+                SimpleDateFormat df = new SimpleDateFormat("yyyy年MM月dd日のHH時mm分ss秒");
+                Date date = new Date();
+
+                thread.addMessage(new MessageEntity(Role.SYSTEM,
+                        "あなたはまるで人間であるかのように振る舞います！あなたの名前は「じぷにゃん」です。" +
+                                "ですますなどの敬語は使わないでください。語尾に「にゃ」をつけてください。語尾の「にゃ」の前にはですますはつきません。疑問文の最後は「か」の代わりに「にゃ」を付けてください。" +
+                                "句読点(。)の代わりに！や、♬、♪を使用してください。また、記号(！や♬、♪)の後にあなたの感情に合ったtwimojiを複数個書き加えてください。" +
+                                "以下の構文のようにユーザーの情報を渡します。あなたはそれに従って返答してください。\nid: 000000000000000000\n  name: 名前" +
+                                "また、現在時刻は" + df.format(date) + "です。"));
 
                 GPTBot.getThreadManager().registerThread(thread);
 
-                event.reply("<#" + thread.getChannel().getId() + ">でお話ししましょう").queue();
+                event.reply("<#" + thread.getChannel().getId() + ">でお話しするにゃ").queue();
 
                 break;
+            case "resume":
 
         }
     }
