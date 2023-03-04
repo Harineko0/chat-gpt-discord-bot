@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.entities.User;
 public class GPTConverter {
     public static String messageSyntax(MessageEntity message) {
         if (message.user() != null) {
-            return "id: " + message.user().getId() + "\n" +
+            return "id: " + message.user().getId() +
                     "  message: " + message.content();
         } else {
             return message.content();
@@ -14,7 +14,7 @@ public class GPTConverter {
     }
 
     public static String addUserSyntax(User user) {
-        return "id: " + user.getId() + "\n" +
-                "  name: " + user.getName() + "\n";
+        return "id: " + user.getId() +
+                "  name: " + user.getName();
     }
 }

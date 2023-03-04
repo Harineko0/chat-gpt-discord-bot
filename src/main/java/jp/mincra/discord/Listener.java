@@ -2,6 +2,7 @@ package jp.mincra.discord;
 
 import jp.mincra.Constant;
 import jp.mincra.GPTBot;
+import jp.mincra.chatgpt.dto.GPTRequest;
 import jp.mincra.chatgpt.dto.GPTResponse;
 import jp.mincra.chatgpt.dto.Message;
 import jp.mincra.chatgpt.dto.Role;
@@ -65,18 +66,22 @@ public class Listener extends ListenerAdapter {
 
             if (threadManager.isRegistered(id)) {
                 Thread thread = threadManager.getThread(id);
-                thread.addMessage(new MessageEntity(Role.USER, event.getMessage().getContentDisplay().replaceAll("\n", ""), event.getAuthor()));
-                System.out.println("Thread: " + thread);
+                thread.addMessage(new MessageEntity(Role.USER, event.getMessage().getContentDisplay(), event.getAuthor()));
 
                 try {
-                    GPTResponse res = GPTBot.getGpt().post(thread.generateRequest());
+                    GPTRequest req = thread.generateRequest();
+                    System.out.println("Request: " + req);
+                    var future = channel.sendTyping().submit();
+
+                    GPTResponse res = GPTBot.getGpt().post(req);
                     System.out.println("Response: " + res);
                     if (res.getChoices() != null) {
                         Message reply = res.getChoices().get(0).getMessage();
-                        thread.addMessage(new MessageEntity(reply.getRole(), reply.getContent().replaceAll("\n", "")));
+                        thread.addMessage(new MessageEntity(reply.getRole(), reply.getContent()));
                         channel.sendMessage(reply.getContent()).queue();
                     }
 
+                    future.cancel(true);
 
                 } catch (IOException | InterruptedException e) {
                     throw new RuntimeException(e);
@@ -107,7 +112,7 @@ public class Listener extends ListenerAdapter {
                                 .map(message -> new MessageEntity(
                                         // TODO isBotではなくisChatGPTBotで分岐できるように修正する
                                         message.getAuthor().isBot() ? Role.ASSISTANT : Role.USER,
-                                        message.getContentDisplay().replaceAll("\n", ""),
+                                        message.getContentDisplay(),
                                         message.getAuthor()
                                 ))
                                 .toList();
