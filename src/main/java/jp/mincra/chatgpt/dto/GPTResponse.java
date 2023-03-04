@@ -110,7 +110,7 @@ public class GPTResponse {
 
     @Override
     public String toString() {
-        return "{\"GPTResponse\":{"
+        return "{"
                 + "\"choices\":" + choices
                 + ", \"created\":\"" + created + "\""
                 + ", \"id\":\"" + id + "\""

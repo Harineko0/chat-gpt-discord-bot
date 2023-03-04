@@ -70,30 +70,12 @@ public class Usage {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(Usage.class.getName()).append('@').append(Integer.toHexString(System.identityHashCode(this))).append('[');
-        sb.append("completionTokens");
-        sb.append('=');
-        sb.append(((this.completionTokens == null)?"<null>":this.completionTokens));
-        sb.append(',');
-        sb.append("promptTokens");
-        sb.append('=');
-        sb.append(((this.promptTokens == null)?"<null>":this.promptTokens));
-        sb.append(',');
-        sb.append("totalTokens");
-        sb.append('=');
-        sb.append(((this.totalTokens == null)?"<null>":this.totalTokens));
-        sb.append(',');
-        sb.append("additionalProperties");
-        sb.append('=');
-        sb.append(((this.additionalProperties == null)?"<null>":this.additionalProperties));
-        sb.append(',');
-        if (sb.charAt((sb.length()- 1)) == ',') {
-            sb.setCharAt((sb.length()- 1), ']');
-        } else {
-            sb.append(']');
-        }
-        return sb.toString();
+        return "{"
+                + "\"completionTokens\":\"" + completionTokens + "\""
+                + ", \"promptTokens\":\"" + promptTokens + "\""
+                + ", \"totalTokens\":\"" + totalTokens + "\""
+                + ", \"additionalProperties\":" + additionalProperties
+                + "}}";
     }
 
     @Override

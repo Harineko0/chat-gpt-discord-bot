@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Objects;
 
@@ -111,17 +112,19 @@ public class Listener extends ListenerAdapter {
                 .filter(channel -> channel.isJoined() && !channel.isArchived()).toList();
         for (ThreadChannel channel : channels) {
             String latest = channel.getLatestMessageId();
-            // 直近10件のみを取得
-            channel.getHistoryBefore(latest, 10)
+            channel.getHistoryBefore(latest, 20)
                     .queue(messageHistory -> {
-                        var history = messageHistory.getRetrievedHistory().stream()
+                        var history = new java.util.ArrayList<>(messageHistory.getRetrievedHistory().stream()
                                 .map(message -> new MessageEntity(
                                         // TODO isBotではなくisChatGPTBotで分岐できるように修正する
                                         message.getAuthor().isBot() ? Role.ASSISTANT : Role.USER,
                                         message.getContentDisplay(),
-                                        message.getAuthor()
+                                        message.getAuthor().isBot() ? null : message.getAuthor()
                                 ))
-                                .toList();
+                                .toList());
+                        Collections.reverse(history);
+
+                        System.out.println(history);
 
                         threadManager.registerThread(new Thread(channel, history));
                     });
