@@ -5,6 +5,7 @@ import jp.mincra.GPTBot;
 import jp.mincra.chatgpt.dto.GPTResponse;
 import jp.mincra.chatgpt.dto.Message;
 import jp.mincra.chatgpt.dto.Role;
+import jp.mincra.discord.entity.MessageEntity;
 import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.forums.ForumPost;
@@ -42,7 +43,7 @@ public class Listener extends ListenerAdapter {
 
                 ForumPost post = botForum.createForumPost(threadTitle, MessageCreateData.fromContent("私は役に立つアシスタントです")).complete();
                 Thread thread = new Thread(post.getThreadChannel());
-                thread.addMessage(Message.create(Role.SYSTEM, "あなたは役に立つアシスタントです。"));
+                thread.addMessage(new MessageEntity(Role.SYSTEM, "あなたは役に立つアシスタントです。以下の構文のようにユーザーの情報を渡します。あなたはそれに従って返答してください。\nid: 000000000000000000\n  name: 名前"));
 
                 GPTBot.getThreadManager().registerThread(thread);
 
@@ -64,7 +65,7 @@ public class Listener extends ListenerAdapter {
 
             if (threadManager.isRegistered(id)) {
                 Thread thread = threadManager.getThread(id);
-                thread.addMessage(Message.create(Role.USER, event.getMessage().getContentDisplay().replaceAll("\n", "")));
+                thread.addMessage(new MessageEntity(Role.USER, event.getMessage().getContentDisplay().replaceAll("\n", ""), event.getAuthor()));
                 System.out.println("Thread: " + thread);
 
                 try {
@@ -72,7 +73,7 @@ public class Listener extends ListenerAdapter {
                     System.out.println("Response: " + res);
                     if (res.getChoices() != null) {
                         Message reply = res.getChoices().get(0).getMessage();
-                        thread.addMessage(Message.create(reply.getRole(), reply.getContent().replaceAll("\n", "")));
+                        thread.addMessage(new MessageEntity(reply.getRole(), reply.getContent().replaceAll("\n", "")));
                         channel.sendMessage(reply.getContent()).queue();
                     }
 
@@ -103,10 +104,11 @@ public class Listener extends ListenerAdapter {
             channel.getHistoryBefore(latest, 10)
                     .queue(messageHistory -> {
                         var history = messageHistory.getRetrievedHistory().stream()
-                                .map(message -> Message.create(
+                                .map(message -> new MessageEntity(
                                         // TODO isBotではなくisChatGPTBotで分岐できるように修正する
                                         message.getAuthor().isBot() ? Role.ASSISTANT : Role.USER,
-                                        message.getContentDisplay().replaceAll("\n", "")
+                                        message.getContentDisplay().replaceAll("\n", ""),
+                                        message.getAuthor()
                                 ))
                                 .toList();
 

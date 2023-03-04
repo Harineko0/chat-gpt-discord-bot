@@ -90,4 +90,12 @@ public class Message {
         message.setContent(content);
         return message;
     }
+
+    public static Message create(boolean isBot, String content) {
+        Role role = isBot ? Role.ASSISTANT : Role.USER;
+        Message message = new Message();
+        message.setRole(role.toString());
+        message.setContent(content);
+        return message;
+    }
 }
