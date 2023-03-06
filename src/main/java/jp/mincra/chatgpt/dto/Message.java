@@ -37,7 +37,7 @@ public class Message {
 
     @JsonProperty("content")
     public String getContent() {
-        return content.replaceAll("\n", "");
+        return content;
     }
 
     @JsonProperty("content")

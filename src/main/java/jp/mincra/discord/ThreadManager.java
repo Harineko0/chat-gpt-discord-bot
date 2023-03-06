@@ -18,4 +18,8 @@ public class ThreadManager {
     public Thread getThread(String id) {
         return idToThread.get(id);
     }
+
+    public void clearMessagesAll(String id) {
+        idToThread.get(id).removeAllMessages();
+    }
 }

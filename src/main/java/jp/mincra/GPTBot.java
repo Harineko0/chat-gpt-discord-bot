@@ -27,7 +27,10 @@ public class GPTBot {
                 .build();
 
         jda.updateCommands().addCommands(
-                Commands.slash("talk", "新しいスレッドでお話しするにゃ").addOption(OptionType.STRING, "thread-title", "スレッドのタイトルにゃ.", true)
+                Commands.slash("talk", "新しいスレッドでお話しするにゃ")
+                        .addOption(OptionType.STRING, "thread-title", "スレッドのタイトルにゃ.", true)
+                        .addOption(OptionType.STRING, "type", "話し方を指定するにゃ。(nya/assistant)", false),
+                Commands.slash("forget", "今までの会話を忘れちゃうにゃ")
         ).queue();
     }
 

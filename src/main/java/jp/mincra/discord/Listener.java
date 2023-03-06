@@ -33,7 +33,23 @@ public class Listener extends ListenerAdapter {
 
         switch (event.getName()) {
             case "talk":
-                String threadTitle = Objects.requireNonNull(event.getOption("thread-title")).getAsString();
+                var title = event.getOption("thread-title");
+                var trainingOp = event.getOption("type");
+                String threadTitle = Objects.requireNonNull(title).getAsString();
+                String training = TrainingMessages.assistant;
+                if (trainingOp != null) {
+                    switch (trainingOp.getAsString()){
+                        case "nya":
+                            training = TrainingMessages.neko;
+                            break;
+                        case "assistant":
+                            training = TrainingMessages.assistant;
+                            break;
+                        default:
+                            event.reply("その喋り方は登録されてないにゃ").queue();
+                            return;
+                    }
+                }
 
                 if (botForum == null) {
                     event.reply("フォーラムが見つかりません！サーバー管理者に連絡してください。").queue();
@@ -47,18 +63,20 @@ public class Listener extends ListenerAdapter {
 
                 ForumPost post = botForum.createForumPost(threadTitle, MessageCreateData.fromContent("じぷにゃんにゃ。何を話すにゃ？")).complete();
                 Thread thread = new Thread(post.getThreadChannel());
-                SimpleDateFormat df = new SimpleDateFormat("yyyy年MM月dd日のHH時mm分ss秒");
-                Date date = new Date();
 
-                thread.addMessage(new MessageEntity(Role.SYSTEM, TrainingMessages.nya + "また、現在時刻は" + df.format(date) + "です。"));
+                thread.addTraining(training);
 
                 GPTBot.getThreadManager().registerThread(thread);
 
                 event.reply("<#" + thread.getChannel().getId() + ">でお話しするにゃ").queue();
 
                 break;
-            case "resume":
-
+            case "forget":
+                String threadId = event.getChannel().getId();
+                ThreadManager threadManager = GPTBot.getThreadManager();
+                threadManager.clearMessagesAll(threadId);
+                threadManager.getThread(threadId).addTraining(TrainingMessages.assistant);
+                event.reply("あれ？今まで何話してたっけにゃ？").queue();
         }
     }
 
@@ -84,11 +102,25 @@ public class Listener extends ListenerAdapter {
                     System.out.println("Response: " + res);
                     if (res.getChoices() != null) {
                         Message reply = res.getChoices().get(0).getMessage();
-                        thread.addMessage(new MessageEntity(reply.getRole(), reply.getContent()));
-                        channel.sendMessage(reply.getContent()).queue();
-                    }
+                        String repContent = reply.getContent();
 
-                    future.cancel(true);
+                        // endkeyword が入力されていた場合はキャッシュを削除する
+                        boolean isEnd = false; //repContent.endsWith(TrainingMessages.endKeyword);
+                        if (isEnd) {
+                            repContent = repContent.replaceAll(TrainingMessages.endKeyword, "");
+                        }
+                        thread.addMessage(new MessageEntity(reply.getRole(), repContent));
+                        channel.sendMessage(repContent).queue(success -> future.cancel(true));
+
+                        if (isEnd) {
+                            thread.initialize();
+                            thread.addMessage(new MessageEntity(Role.SYSTEM, TrainingMessages.neko));
+                        }
+                    } else {
+                        channel.sendMessage("ごめんにゃ、頭がパンクしちゃったにゃ。").queue();
+                        thread.removeLatestMessage();
+                        future.cancel(true);
+                    }
 
                 } catch (IOException | InterruptedException e) {
                     throw new RuntimeException(e);
@@ -112,7 +144,7 @@ public class Listener extends ListenerAdapter {
                 .filter(channel -> channel.isJoined() && !channel.isArchived()).toList();
         for (ThreadChannel channel : channels) {
             String latest = channel.getLatestMessageId();
-            channel.getHistoryBefore(latest, 20)
+            channel.getHistoryBefore(latest, 10)
                     .queue(messageHistory -> {
                         var history = new java.util.ArrayList<>(messageHistory.getRetrievedHistory().stream()
                                 .map(message -> new MessageEntity(
@@ -122,9 +154,9 @@ public class Listener extends ListenerAdapter {
                                         message.getAuthor().isBot() ? null : message.getAuthor()
                                 ))
                                 .toList());
+                        // 猫語・顔文字など調教文を入力
+                        history.add(new MessageEntity(Role.SYSTEM, TrainingMessages.neko));
                         Collections.reverse(history);
-
-                        System.out.println(history);
 
                         threadManager.registerThread(new Thread(channel, history));
                     });

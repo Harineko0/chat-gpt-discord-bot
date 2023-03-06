@@ -6,12 +6,12 @@ import org.jetbrains.annotations.Nullable;
 
 public record MessageEntity(Role role, String content, @Nullable User user) {
     public MessageEntity(Role role, String content) {
-        this(role, content.replaceAll("\n", ""), null);
+        this(role, content, null);
     }
 
     @Override
     public String toString() {
-        return "{\"MessageEntity\":{"
+        return "{"
                 + "\"role\":\"" + role + "\""
                 + ", \"content\":\"" + content + "\""
                 + ", \"user\":" + user
